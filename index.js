@@ -1,19 +1,22 @@
 'use strict'
-//import { renderButton } from './buttons';
+//import { renderButton } from './buttons.js';
 
-
-const limit = 7; 
-let page = 1; 
-let sort;
+/*let sort;
 let order;
-let id;
+let id;*/
+
 
 //car icon
-let link='/race/car1_83961.svg';
+let link='./car1_83961.svg';
 
 let garageUrl = `http://127.0.0.1:3000/garage`
-let winnersUrl = `http://127.0.0.1:3000/winners?_sort=${sort}&_order=${order}&_limit=${limit}`;
+let winnersUrl = `http://127.0.0.1:3000/winners?`;
 
+let carsParams = new URLSearchParams({
+  _page:1,
+  _limit:7,
+});
+carsParams.toString();
 
 const body = document.querySelector('body');
 const fragment1 = new DocumentFragment();
@@ -23,8 +26,9 @@ const fragment3 = new DocumentFragment();
 // the buttons creation
 const toGarageBtn = document.createElement('button');
 toGarageBtn.setAttribute('type', 'button');
-toGarageBtn.classList.add('btn');
-toGarageBtn.classList.add('toGarageBtn');
+//toGarageBtn.classList.add('btn');
+//toGarageBtn.classList.add('toGarageBtn');
+toGarageBtn.classList ='btn toGarageBtn';
 toGarageBtn.innerText = 'To garage';
 
 const toWinnerBtn = document.createElement('button');
@@ -145,7 +149,8 @@ body.appendChild(fragment1);
 
 
 async function getGarageAmount(){
-  await fetch(`${garageUrl}?&_page=${page}&_limit=${limit}`)
+  //await fetch(`${garageUrl}?&_page=${page}&_limit=${limit}`)
+  await fetch(`${garageUrl}?&${carsParams}`)
     .then(response => { 
       let amount = response.headers.get('X-Total-Count')
       garageAmount.append(amount);    
@@ -154,7 +159,8 @@ async function getGarageAmount(){
 }
 
 async function getCarsInGarage(){
-  await fetch(`${garageUrl}?&_page=${page}&_limit=${limit}`)
+  //await fetch(`${garageUrl}?&_page=${page}&_limit=${limit}`)
+  await fetch(`${garageUrl}?&${carsParams}`)
     .then(response => {
       return response.json();   
     })
@@ -265,11 +271,11 @@ carsWrapper.addEventListener('click', event=> {
   return id; 
 })
 
-editCarBtn.addEventListener('submit', updateCar);
+editCarBtn.addEventListener('submit', ()=>updateCar(id));
 
 async function updateCar(id){
     const payload = {name: carName.value, color:carColor.value };
-    fetch(`${garageUrl}/:id=${id}`, {
+    fetch(`${garageUrl}/${id}`, {
       method:'PUT',
       headers:{
         'Content-Type': 'application/json',
@@ -281,11 +287,11 @@ async function updateCar(id){
     e.target.reset();
 }
 
-deleteCarButton.addEventListener('click', deleteCar());
+deleteCarButton.addEventListener('click', () =>deleteCar(id));
 
 //delete car
 async function deleteCar(id){
-    await fetch(`${garageUrl}/:id=${id}`,{method:'DELETE'})
+    await fetch(`${garageUrl}/${id}`,{method:'DELETE'})
       .then((response)=>response.json())
       .then((data) => console.log(data))
       .catch((error) => {console.log(error)})
